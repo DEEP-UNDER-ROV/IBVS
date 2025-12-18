@@ -1,9 +1,15 @@
+        if self.current_vel:
+            vx = self.current_vel.linear.x
+            cv2.putText(stream_frame, f"Vx: {vx:+.2f}", (50, 20), 2, 0.6, (0, 255, 255), 2)
+
+help me publish the other velocity and the error, here ill give the ibvs node for you to write the velocity and the error
+
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
 import numpy as np
-
-from geometry_msgs.msg import PolygonStamped, Twist, Vector3Stamped
+import cv2
+from geometry_msgs.msg import PolygonStamped, Twist
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
@@ -17,7 +23,9 @@ R_CB = np.array([
     [0, 1, 0]
 ], dtype=float)
 
-p_CB = np.array([P_CB_X, P_CB_Y, P_CB_Z])
+# Lever arm: Camera position relative to Drone Center (meters)
+# p_CB = [x, y, z] in Body Frame
+p_CB = np.array([-0.13, 0.0, 0.02])
 
 class IBVSControllerNode(Node):
     def __init__(self):
@@ -30,7 +38,6 @@ class IBVSControllerNode(Node):
 
         # Publisher - Sending velocity setpoints to MAVROS
         self.vel_pub = self.create_publisher(Twist, "/mavros/setpoint_velocity/cmd_vel_unstamped", 10)
-        self.err_pub = self.create_publisher(Vector3Stamped, "/ibvs/error", 10)
 
         self.depth_img = None
 
@@ -89,25 +96,20 @@ class IBVSControllerNode(Node):
             rows.append(L)
 
             # Normalize the current point and the desired point
-            curr = np.array([
-                (u - CX) / FX,
-                (v - CY) / FY,
-                Z
-            ])
-            des = np.array([
-                (self.desired_pts[i, 0] - CX) / FX,
-                (self.desired_pts[i, 1] - CY) / FY,
-                Z_DES
-            ])
-
-            errs.extend(curr - des)
+            curr_x = (u - CX) / FX
+            curr_y = (v - CY) / FY
+            des_x = (self.desired_pts[i, 0] - CX) / FX
+            des_y = (self.desired_pts[i, 1] - CY) / FY
+            
+            # Error in normalized coordinates
+            errs.extend([curr_x - des_x, curr_y - des_y, Z - Z_DES])
 
         Ls = np.vstack(rows)
         e = np.array(errs).reshape(-1, 1)
 
         # --- TERMINAL PRINTING: FEATURE ERRORS ---
         print("\n" + "="*50)
-        print(f"{'Err Feature':<10} | {'ex (px)':<10} | {'ey (px)':<10} | {'ez (m)':<10}")
+        print(f"{'Feature':<10} | {'du (px)':<10} | {'dv (px)':<10} | {'dz (m)':<10}")
         print("-" * 50)
 
         # errs contains [u1, v1, z1, u2, v2, z2, ...]
@@ -162,17 +164,9 @@ class IBVSControllerNode(Node):
         cmd.angular.z = wz
 
         # Safety Check: Log the command to terminal
-        self.get_logger().info(f"Vx: {vx:.2f}, Vy: {vy:.2f}, Vz: {vz:.2f}, Wx: {wx:.2f}, Wy: {wy:.2f}, Wz: {wz:.2f}")
+        self.get_logger().info(f"Publishing Cmd: Lin[{vx:.2f}, {vy:.2f}, {vz:.2f}] Ang_Z: {wz:.2f}")
+        
         self.vel_pub.publish(cmd)
-
-        errs_np = np.array(errs).reshape(4,3)
-        err_msg = Vector3Stamped()
-        err_msg.header.stamp = self.get_clock().now().to_msg()
-        err_msg.vector.x = float(np.mean(errs_np[:,0]))
-        err_msg.vector.y = float(np.mean(errs_np[:,1]))
-        err_msg.vector.z = float(np.mean(errs_np[:,2]))
-
-        self.err_pub.publish(err_msg)
 
 def main():
     rclpy.init()
