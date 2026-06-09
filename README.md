@@ -36,48 +36,6 @@ MAVROS RC Override
 ROV Motion
 ```
 
-
----
-
-## Mathematical Formulation
-
-The image feature error is defined as
-
-```text
-e = s - s_d
-```
-
-where
-
-* (s) : current image feature vector
-* (s_d) : desired image feature vector
-
-The interaction matrix relates camera velocity to image feature velocity:
-
-[\dot{s}=L(s,Z)\mathbf{v}]
-
-where
-
-* (L) : interaction matrix
-* (Z) : feature depth
-* (\mathbf{v}) : camera velocity
-
-The proposed PI-augmented control law is
-
-[
-\mathbf{v}
-==========
-
--\lambda L^{+} \left(e + K_i \int e,dt \right)]
-
-where
-
-* (\lambda) : proportional gain
-* (K_i) : integral gain
-* (L^{+}) : Moore-Penrose pseudoinverse of the interaction matrix
-
----
-
 ## Dependencies
 
 * ROS2 Jazzy
@@ -115,7 +73,7 @@ git clone https://github.com/DEEP-UNDER-ROV/IBVS.git
 Build the package.
 
 ```bash
-cd ~/rov_ws
+cd ~/your_ws
 
 colcon build
 
