@@ -7,7 +7,7 @@ A ROS2 implementation of **Stereo-enhanced Image-based Visual Servoing (IBVS)** 
 
 
 
-The system estimates target pose directly from image features and generates body-frame velocity commands for closed-loop visual servoing.
+The system estimates target pose directly from image features and generates PWM commands sent to the FCU via MAVRROS for closed-loop visual servoing.
 
 ---
 
