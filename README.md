@@ -1,6 +1,6 @@
 # Stereo-enhanced Image-based Visual Servoing (IBVS) for Underwater ROV
 
-A ROS2 implementation of **Stereo-enhanced Image-based Visual Servoing (IBVS)** for underwater ROV positioning using **stereo vision**, **AprilTag feature extraction**, and a **PI-augmented control law**.
+A ROS2 implementation of **Stereo-enhanced Image-based Visual Servoing (IBVS)** for underwater ROV positioning using **stereo vision**, **AprilTag feature extraction**, and a **PI-augmented control law** via ssh communication between Ground Station and the U-ROV.
 
 <img width="400" height="235" alt="frame_proj" src="https://github.com/user-attachments/assets/722671fe-7fa3-4187-a49f-8d7075927780" /> <img width="400" height="235" alt="U-ROVs2" src="https://github.com/user-attachments/assets/c78c6581-40a1-4368-84cd-c6bfb52926f0" />
 
@@ -46,7 +46,7 @@ ROV Motion
 * ROS2 Jazzy
 * Python 3.10+
 * OpenCV
-* DU Perception AprilTag Triangulate Library
+* DU Perception AprilTag Triangulate Library <br>
   https://github.com/DEEP-UNDER-ROV/DU_Perception_Apriltag_Triangulate
 * cv_bridge
 * MAVROS
@@ -66,7 +66,7 @@ sudo apt install -y python3-opencv \
 
 ```
 
-Clone the DU Perception repository first into your ROS2 workspace, follow the guides on readme.md.
+Clone the DU Perception repository first into your ROS2 workspace, follow the guides on readme.md. <br>
 Clone IBVS repository into your ROS2 workspace;
 
 ```bash
@@ -88,8 +88,21 @@ source install/setup.bash
 ---
 
 ## Running
-Launch the DU Perception AprilTag Triangulate
-Launch the IBVS system:
+Launch DU Perception AprilTag Triangulate
+
+```bash
+ros2 launch rov_vision uw_rs_apriltag_triangulation.launch.xml
+ros2 param set /camera/camera depth_module.emitter_enabled 0
+```
+
+Launch MAVROS node:
+
+```bash
+ros2 launch mavros apm.launch fcu_url:="serial:///dev/ttyACM0:921600" gcs_url:="udp:ssh_ip"
+```
+
+
+Launch IBVS system:
 
 ```bash
 ros2 launch ibvs visualize
