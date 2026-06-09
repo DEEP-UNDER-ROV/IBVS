@@ -2,6 +2,10 @@
 
 A ROS2 implementation of **Stereo-enhanced Image-based Visual Servoing (IBVS)** for underwater ROV positioning using **stereo vision**, **AprilTag feature extraction**, and a **PI-augmented control law**.
 
+<img width="500" height="285" alt="frame_proj" src="https://github.com/user-attachments/assets/722671fe-7fa3-4187-a49f-8d7075927780" /> <img width="500" height="285" alt="image" src="https://github.com/user-attachments/assets/f579a549-bcea-4595-a1dc-18834c9cc6b0" />
+
+
+
 The system estimates target pose directly from image features and generates body-frame velocity commands for closed-loop visual servoing.
 
 ---
@@ -112,10 +116,5 @@ ros2 launch ibvs ibvs
 | `Kp`           | Proportional gain        |
 | `Ki`           | Integral gain            |
 | `mu`           | Pseudoinverse Dampening  |
-
----
-
-## Example Results
-
 
 ---
