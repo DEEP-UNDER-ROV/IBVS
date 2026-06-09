@@ -83,24 +83,33 @@ where
 * ROS2 Jazzy
 * Python 3.10+
 * OpenCV
-* NumPy
-* SciPy
+* DU Perception AprilTag Triangulate Library
+  https://github.com/DEEP-UNDER-ROV/DU_Perception_Apriltag_Triangulate
 * cv_bridge
 * MAVROS
-* AprilTag detector
-* geometry_msgs
-* std_msgs
 
 ---
 
 ## Installation
+Install required library for GStreamer
+```bash
+sudo apt install -y python3-opencv \
+  gstreamer1.0-plugins-base \
+  gstreamer1.0-plugins-good \
+  gstreamer1.0-plugins-bad \
+  gstreamer1.0-plugins-ugly \
+  gstreamer1.0-libav \
+  gstreamer1.0-tools
 
-Clone the repository into your ROS2 workspace.
+```
+
+Clone the DU Perception repository first into your ROS2 workspace, follow the guides on readme.md.
+Clone IBVS repository into your ROS2 workspace;
 
 ```bash
-cd ~/rov_ws/src
+cd ~/your_ws/src
 
-git clone https://github.com/USERNAME/IBVS.git
+git clone https://github.com/DEEP-UNDER-ROV/IBVS.git
 ```
 
 Build the package.
@@ -108,7 +117,7 @@ Build the package.
 ```bash
 cd ~/rov_ws
 
-colcon build --symlink-install
+colcon build
 
 source install/setup.bash
 ```
@@ -116,11 +125,12 @@ source install/setup.bash
 ---
 
 ## Running
-
+Launch the DU Perception AprilTag Triangulate
 Launch the IBVS system:
 
 ```bash
-ros2 launch ibvs ibvs.launch.py
+ros2 launch ibvs visualize
+ros2 launch ibvs ibvs
 ```
 
 ---
@@ -129,33 +139,25 @@ ros2 launch ibvs ibvs.launch.py
 
 | Topic                 | Description              |
 | --------------------- | ------------------------ |
+| `/apriltag/corners`   | AprilTag corner features |
 | `/ibvs/error`         | Image feature error      |
-| `/ibvs/velocity`      | Desired body velocity    |
-| `/detector/corners`   | AprilTag corner features |
-| `/stereo/depth`       | Estimated feature depth  |
+| `/ibvs/vel_body`      | Desired body velocity    |
+| `/ibvs/pwm_debug`     | IBVS PWM Control         |
 | `/mavros/rc/override` | RC override commands     |
 
 ---
 
 ## Controller Parameters
 
-| Parameter      | Description          |
-| -------------- | -------------------- |
-| `lambda_gain`  | Proportional gain    |
-| `ki_gain`      | Integral gain        |
-| `deadband`     | Error deadband       |
-| `max_velocity` | Velocity saturation  |
-| `control_rate` | Controller frequency |
+| Parameter      | Description              |
+| -------------- | -------------------------|
+| `Kp`           | Proportional gain        |
+| `Ki`           | Integral gain            |
+| `mu`           | Pseudoinverse Dampening  |
 
 ---
 
 ## Example Results
 
-Typical closed-loop response:
-
-* Stable feature convergence
-* Smooth velocity commands
-* Reduced steady-state error
-* Robust tracking under depth variation
 
 ---
