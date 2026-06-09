@@ -1,41 +1,27 @@
-# Image-Based Visual Servoing (IBVS) for Underwater ROV
+# Stereo-enhanced Image-based Visual Servoing (IBVS) for Underwater ROV
 
-A ROS2 implementation of **Image-Based Visual Servoing (IBVS)** for autonomous underwater vehicle positioning using **stereo vision**, **AprilTag feature extraction**, and a **PI-augmented control law**.
+A ROS2 implementation of **Stereo-enhanced Image-based Visual Servoing (IBVS)** for underwater ROV positioning using **stereo vision**, **AprilTag feature extraction**, and a **PI-augmented control law**.
 
 The system estimates target pose directly from image features and generates body-frame velocity commands for closed-loop visual servoing.
-
----
-
-## Features
-
-* ROS2 Python implementation
-* Stereo camera support
-* AprilTag corner detection
-* Image-Based Visual Servoing (IBVS)
-* PI/PID controller extension
-* Real-time interaction matrix computation
-* Depth-assisted feature control
-* MAVROS RC Override interface
-* Designed for underwater ROV applications
 
 ---
 
 ## System Architecture
 
 ```
-Stereo Cameras
+Stereo Camera InfraRed Left-right
        │
        ▼
-AprilTag Detection
+AprilTag Detection Corner
        │
        ▼
-Feature Extraction (u,v,Z)
+Feature Extraction per each corner (u,v,Z)
        │
        ▼
 Image Error Computation
        │
        ▼
-Interaction Matrix (L)
+Interaction Matrix (Ls)
        │
        ▼
 PI-Augmented IBVS Controller
@@ -50,32 +36,6 @@ MAVROS RC Override
 ROV Motion
 ```
 
----
-
-## Repository Structure
-
-```
-ibvs/
-│
-├── launch/
-│   └── ibvs.launch.py
-│
-├── config/
-│   └── controller.yaml
-│
-├── scripts/
-│   ├── ibvs_node.py
-│   ├── detector_node.py
-│   └── stereo_depth.py
-│
-├── msg/
-│
-├── src/
-│
-├── figures/
-│
-└── README.md
-```
 
 ---
 
@@ -108,14 +68,7 @@ The proposed PI-augmented control law is
 \mathbf{v}
 ==========
 
--\lambda L^{+}
-\left(
-e
-+
-K_i
-\int e,dt
-\right)
-]
+-\lambda L^{+} \left(e + K_i \int e,dt \right)]
 
 where
 
@@ -127,7 +80,7 @@ where
 
 ## Dependencies
 
-* ROS2 Humble / Jazzy
+* ROS2 Jazzy
 * Python 3.10+
 * OpenCV
 * NumPy
@@ -164,18 +117,10 @@ source install/setup.bash
 
 ## Running
 
-Launch the complete IBVS system:
+Launch the IBVS system:
 
 ```bash
 ros2 launch ibvs ibvs.launch.py
-```
-
-Or run individual nodes:
-
-```bash
-ros2 run ibvs detector_node
-
-ros2 run ibvs ibvs_node
 ```
 
 ---
